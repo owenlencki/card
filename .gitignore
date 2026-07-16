@@ -1,3 +1,4 @@
 # local build + preview helpers (not part of the published site)
 _gen_qr.py
 .claude/
+.DS_Store

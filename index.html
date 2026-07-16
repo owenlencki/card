@@ -166,8 +166,8 @@
       font-weight: 400;
     }
 
-    /* ── Save Contact (primary) ── */
-    .save-btn {
+    /* ── Text Me (primary) ── */
+    .text-btn {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -181,20 +181,53 @@
       font-size: 1rem;
       font-weight: 600;
       font-family: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 180ms ease-out;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .text-btn:hover {
+      background: var(--maroon-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(122, 40, 56, 0.25);
+    }
+    .text-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(122, 40, 56, 0.15);
+    }
+    .text-btn svg { width: 20px; height: 20px; }
+    .text-hint {
+      font-size: 0.8125rem;
+      color: var(--text-3);
+      text-align: center;
+      margin-top: -18px;
+    }
+
+    /* ── Save Contact (secondary) ── */
+    .save-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 14px 24px;
+      background: transparent;
+      color: var(--text-2);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      font-family: inherit;
       cursor: pointer;
       transition: all 180ms ease-out;
       -webkit-tap-highlight-color: transparent;
     }
     .save-btn:hover {
-      background: var(--maroon-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(122, 40, 56, 0.25);
+      border-color: var(--text-3);
+      color: var(--text);
     }
-    .save-btn:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 8px rgba(122, 40, 56, 0.15);
-    }
-    .save-btn svg { width: 20px; height: 20px; }
+    .save-btn:active { transform: translateY(0); }
+    .save-btn svg { width: 18px; height: 18px; }
 
     /* ── Show QR (secondary) ── */
     .qr-btn {
@@ -318,6 +351,13 @@
 
     </div>
 
+    <a class="text-btn" href="sms:+17152700311?&body=Hey%20Owen%2C%20just%20grabbed%20your%20card!%20This%20is%20">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z"/></svg>
+      Text Me
+    </a>
+
+    <p class="text-hint">Opens a pre-filled text. Just hit send.</p>
+
     <button class="save-btn" onclick="saveContact()">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
       Save Contact
@@ -351,17 +391,30 @@
         'ADR;TYPE=WORK:;;Waupaca;WI;;US',
         'NOTE:AI automation and web development for small businesses',
         'END:VCARD'
-      ].join('\n');
+      ].join('\r\n');
 
-      const blob = new Blob([vcard], { type: 'text/vcard;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
+      // 1. Preferred on mobile: share sheet with a real file (iOS/Android add-contact flow).
+      if (navigator.canShare && navigator.share) {
+        try {
+          const file = new File([vcard], 'Owen-Lencki.vcf', { type: 'text/vcard' });
+          if (navigator.canShare({ files: [file] })) {
+            navigator.share({ files: [file] }).catch(function () { downloadVcard(vcard); });
+            return;
+          }
+        } catch (e) { /* fall through to download */ }
+      }
+
+      // 2. Fallback: data: URI download (more reliable on phones than blob: URLs).
+      downloadVcard(vcard);
+    }
+
+    function downloadVcard(vcard) {
       const a = document.createElement('a');
-      a.href = url;
+      a.href = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcard);
       a.download = 'Owen-Lencki.vcf';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
     }
   </script>
 </body>
