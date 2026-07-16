@@ -218,6 +218,7 @@
       font-size: 0.9375rem;
       font-weight: 500;
       font-family: inherit;
+      text-decoration: none;
       cursor: pointer;
       transition: all 180ms ease-out;
       -webkit-tap-highlight-color: transparent;
@@ -358,10 +359,10 @@
 
     <p class="text-hint">Opens a pre-filled text. Just hit send.</p>
 
-    <button class="save-btn" onclick="saveContact()">
+    <a class="save-btn" href="owen.vcf">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
       Save Contact
-    </button>
+    </a>
 
     <a class="qr-btn" href="qr.html">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M14 14h3v3M21 14v.01M21 17.5v3.5M17.5 21H21M14 21v-1"/></svg>
@@ -374,48 +375,5 @@
 
   </div>
 
-  <script>
-    function saveContact() {
-      const vcard = [
-        'BEGIN:VCARD',
-        'VERSION:3.0',
-        'FN:Owen Lencki',
-        'N:Lencki;Owen;;;',
-        'ORG:Vaelro LLC',
-        'TITLE:Co-founder',
-        'TEL;TYPE=CELL:+17152700311',
-        'EMAIL:lenckiowen@gmail.com',
-        'URL:https://vaelro.co',
-        'X-SOCIALPROFILE;TYPE=linkedin:https://www.linkedin.com/in/owen-lencki-5b3239374/',
-        'X-SOCIALPROFILE;TYPE=instagram:https://instagram.com/owen_lencki',
-        'ADR;TYPE=WORK:;;Waupaca;WI;;US',
-        'NOTE:AI automation and web development for small businesses',
-        'END:VCARD'
-      ].join('\r\n');
-
-      // 1. Preferred on mobile: share sheet with a real file (iOS/Android add-contact flow).
-      if (navigator.canShare && navigator.share) {
-        try {
-          const file = new File([vcard], 'Owen-Lencki.vcf', { type: 'text/vcard' });
-          if (navigator.canShare({ files: [file] })) {
-            navigator.share({ files: [file] }).catch(function () { downloadVcard(vcard); });
-            return;
-          }
-        } catch (e) { /* fall through to download */ }
-      }
-
-      // 2. Fallback: data: URI download (more reliable on phones than blob: URLs).
-      downloadVcard(vcard);
-    }
-
-    function downloadVcard(vcard) {
-      const a = document.createElement('a');
-      a.href = 'data:text/vcard;charset=utf-8,' + encodeURIComponent(vcard);
-      a.download = 'Owen-Lencki.vcf';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-  </script>
 </body>
 </html>
